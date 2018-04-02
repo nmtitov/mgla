@@ -13,6 +13,23 @@
     (@server :timeout 100)
     (reset! server nil)))
 
+(defn handler [req]
+  (ohs/with-channel req channel
+                    (ohs/on-close channel (fn [status]
+                                            (println "channel closed")))
+                    (if (ohs/websocket? channel)
+                      (println "Websocket channel")
+                      (println "HTTP channel"))
+                    (ohs/on-receive channel (fn [data]
+                                              (ohs/send! channel data)))))
+
+(defn start-server []
+  (reset! server (ohs/run-server #'handler {:port 8080})))
+
 (defn -main [& args]
-  (reset! server (ohs/run-server #'index {:port 8080}))
+  (start-server)
   (println "Server started on port 8080"))
+
+(comment
+  (start-server)
+  (stop-server))
