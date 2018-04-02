@@ -4,11 +4,15 @@
 (defn index [req]
   {:status  200
    :headers {"Content-Type" "text/html"}
-   :body    "Hello, World!"})
+   :body    "Hello, W!"})
+
+(defonce server (atom nil))
+
+(defn stop-server []
+  (when-not (nil? @server)
+    (@server :timeout 100)
+    (reset! server nil)))
 
 (defn -main [& args]
-  (ohs/run-server #'index {:port 8080})
+  (reset! server (ohs/run-server #'index {:port 8080}))
   (println "Server started on port 8080"))
-
-(comment
-  (-main))
